@@ -1,0 +1,96 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Update apt cache and upgrade packages
+      apt:
+        update_cache: yes
+        upgrade: yes
+    - name: Import Docker GPG key
+      shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+      changed_when: false
+      
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable
+        state: present
+        
+    - name: Update apt cache after adding Docker repo
+      apt:
+        update_cache: yes
+
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: present
+
+    - name: Add vagrant user to docker group
+      user:
+        name: vagrant
+        groups: docker
+        append: yes
+
+    - name: Enable and start Docker service
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+
+    - name: Ensure Docker is running
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Install dependencies for Docker Compose
+      apt:
+        name: curl
+        state: present
+
+    - name: Check if Docker Compose is installed
+      command: docker-compose --version
+      register: docker_compose_check
+      ignore_errors: true
+
+    - name: Install Docker Compose
+      get_url:
+        url: "https://github.com/docker/compose/releases/download/v2.27.1/docker-compose-{{ ansible_system | lower }}-{{ ansible_architecture }}"
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+      when: docker_compose_check.failed
+
+    - name: Verify Docker Compose installation
+      command: docker-compose --version
+
+    - name: Create directories for application and database
+      file:
+        path: /home/vagrant/{{ item }}
+        state: directory
+      with_items:
+        - src
+        - db
+
+    - name: Copy application files
+      copy:
+        src: ./src/
+        dest: /home/vagrant/src/
+    
+    - name: Copy database initialization files
+      copy:
+        src: ./db/
+        dest: /home/vagrant/db/
+
+    - name: Copy docker-compose.yml file
+      copy:
+        src: ./docker-compose.yml
+        dest: /home/vagrant/docker-compose.yml
+
+    - name: Copy Dockerfile
+      copy:
+        src: ./Dockerfile
+        dest: /home/vagrant/Dockerfile
+
+    - name: Build and run Docker containers with docker-compose
+      command: docker-compose up -d
+      args:
+        chdir: /home/vagrant

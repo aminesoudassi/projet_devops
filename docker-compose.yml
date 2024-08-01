@@ -1,0 +1,25 @@
+services:
+  app:
+    build: .
+    container_name: myapp_c
+    ports:
+      - "9000:80"
+    volumes:
+      - ./src:/var/www/html
+  db:
+    image: mysql:latest
+    container_name: mysql_c
+    environment:
+      - MYSQL_DATABASE=php_docker
+      - MYSQL_USER=php_docker
+      - MYSQL_PASSWORD=root
+      - MYSQL_ALLOW_EMPTY_PASSWORD=1
+    volumes:
+      - "./db:/docker-entrypoint-initdb.d"
+  phpmyadmin:
+    image: phpmyadmin:latest
+    ports:
+      - "9001:80"
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
