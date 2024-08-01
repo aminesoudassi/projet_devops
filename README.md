@@ -1,4 +1,11 @@
-## This Readme file is still not completed
+# This Readme file is still not completed
+
+# Projet Devops
+
+A brief description
+
+So this project is about installing two virtual machines and installe inside them docker, docker compose, and run a small application inside them using ansible
+
 ## Roadmap of using this project
 
 - I installed Vagrant from this link for windows https://www.vagrantup.com/ and after that verifie the installation using this command inside the cmd.
