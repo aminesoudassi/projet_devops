@@ -16,7 +16,7 @@ So this project is about installing two virtual machines and installe inside the
 
 - I created a folder called projet_devops. you can name it whatever you want.
 
-- I created a file called " Vagrantfile ". See the configuration about the two virtual machines inside it.
+- I created the vagrant file and you must name it "Vagrantfile" . See the configuration about the two virtual machines inside it.
 
 - I installed Git to use the command line for windows from this link https://git-scm.com/downloads
 
