@@ -1,5 +1,3 @@
-# This Readme file is still not completed
-
 # Projet Devops
 
 A brief description
